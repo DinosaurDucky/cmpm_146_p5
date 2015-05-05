@@ -215,11 +215,6 @@ for name, rule in Crafting['Recipes'].items():
 
 
 
-
-
-
-
-
 #could working
 def graph(state):
    tempList = []
@@ -233,7 +228,7 @@ def graph(state):
    return tempList
 
 
-
+#add name of action
 
 
 
@@ -242,53 +237,177 @@ optimal = {"wooden_pickaxe": 18, 'stone_pickaxe':31, 'furnace': 48, "iron_pickax
 
 #might be working
 def heuristic(state):
-
-   for req in Crafting['Recipes'].items():
-      
-      if 'Requires' in req[1]:
-         for reqI in req[1]['Requires']:
-            if reqI in state and state[reqI] > 1:
-               return 9000000
-   
-   h = 0
-
-   """
-
-
-   for item in Crafting['Goal']:
- 
-      if item in optimal:
-         if item not in state:
-            h += optimal[item] * Crafting['Goal'][item]
-         else:
-            h += optimal[item] * (Crafting['Goal'][item]-state[item])
-
-      else:
-         if item not in state:
-            h += Crafting['Goal'][item]
-
-         else:
-            h += Crafting['Goal'][item] - state[item]
-
-
-
-
-
-
-   print"h is", h
-   return h
-   """
    dist = 0
-   goal = 0
-   for item in state:
-      
+   for req in Crafting['Recipes'].items():
 
+
+      if 'Requires' in req[1]:
+
+
+
+
+         for reqI in req[1]['Requires']:
+
+
+
+
+            if reqI in state :
+
+               
+               if reqI in Crafting['Goal']:
+                  if state[reqI] > Crafting['Goal'][reqI]:
+                     return 900000
+               elif state[reqI] > 1 :
+                  return 9000000
+
+
+
+
+   #now we have a trimmed goal, showing what we need, and an inventory with "extra items"
+
+   for item in state:
       if item in Crafting['Goal']:
-        dist += Crafting['Goal'][item] - state[item]
+
+
+        dist +=     max((Crafting['Goal'][item] - state[item]),0)
       else:
          dist += state[item]
+
+
+
+
+
+
+
+
+
+
+
    return dist
-   #"""
+
+
+ 
+  
+
+
+  
+
+
+   """
+   #attemp 1
+   glist = [] #dict(Crafting['Goal'])
+   ilist = []
+
+   for goal in Crafting['Goal']:
+      glist.append( (goal, Crafting['Goal'][goal]) )
+
+   for item in state:
+      ilist.append( (item, state[item]) )
+
+   while glist:
+      goal,numG = glist.pop();
+      found = False;
+
+      #go through inventory
+      for tupleT in ilist:
+
+         item, numI = tupleT
+
+         #if the inventory has our goal item
+         if item == goal:
+            #figure out if we made too many or need to make more
+            #how many we need minus how many we have
+            dif = numG - numI
+
+            #if we are missing some
+            if dif>0 :
+               ilist.remove(tupleT)
+               d
+
+            #too many
+            elif dif<0:
+               print
+
+            #just right
+            else: 
+
+            found = True;
+            break;
+
+      for item in ilist:
+         dist += ilist[item]
+
+
+
+
+      
+
+
+      #attemp 2
+
+      for goal in glist:
+         for item in ilist:
+            if item == goal:
+
+               if ilist[item] > glist[item]:
+                  #leaves the extra
+                  ilist[item] -= glist[item]
+                  del glist[item]
+               
+               elif ilist[item] < glist[item]:
+                  #shows how many are left
+                  glist[item] -= ilist[item]
+                  del ilist[item]
+               
+               else: # ilist[item] == glist[item]
+                  del glist[goal]
+                  del ilist[goal]
+
+      
+
+
+
+
+
+
+
+
+
+
+
+      #attemp 3
+      h = 0
+
+
+      for item in Crafting['Goal']:
+    
+         if item in optimal:
+            if item not in state:
+               h += optimal[item] * Crafting['Goal'][item]
+            else:
+               h += optimal[item] * (Crafting['Goal'][item]-state[item])
+
+         else:
+            if item not in state:
+               h += Crafting['Goal'][item]
+
+            else:
+               h += Crafting['Goal'][item] - state[item]
+
+
+
+
+
+
+      print"h is", h
+      return h
+      """
+
+
+
+
+
+
 
 
 #should be working
@@ -306,7 +425,7 @@ def is_goal(state):
 
 
 
-limit = 250
+limit = 500
 initial_state = Crafting['Initial']
 
 fc, fl = search(graph, initial_state, is_goal, limit, heuristic)
