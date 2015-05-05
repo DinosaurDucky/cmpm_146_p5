@@ -2,7 +2,11 @@
   "Initial": {
 }, 
   "Goal": {
-    "wood": 1
+
+    "cart":1,
+    "rail":10
+   
+
   },
   "Items": [
     "bench", 
