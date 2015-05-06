@@ -249,7 +249,16 @@ for req in Crafting['Recipes'].items():
          consumedItems[reqI] =  req[1]['Consumes'][reqI]
 
 
-
+maxConsumables = {
+   "coal"   : 1, 
+   "cobble" : 8, 
+   "ingot"  : 6, 
+   "ore"    : 1, 
+   "plank"  : 4, 
+   "rail"   : Crafting['Goal']['rail']  if 'rail' in Crafting['Goal'] else 0, 
+   "stick"  : 2, 
+   "wood"   : 1,  
+}
 
 
 #might be working
@@ -257,11 +266,15 @@ def heuristic(state):
    dist = 0
    for item, count in state.items():
       if count > 1 and item not in Crafting['Goal'] and item in requiredItems:
-         print "here"
+#         print "here"
          return float('inf')
       elif item in Crafting['Goal'] and count > Crafting['Goal'][item]:
-         print "there"
+#         print "there"
          return float('inf')
+      #elif item in maxConsumables and count > maxConsumables[item]:
+         #print count, " is too many of ", item
+         #return float('inf')
+
 
 
       """
@@ -282,18 +295,7 @@ def heuristic(state):
       else:
          dist += state[item]
 
-
-
-
-
-
-
-
-
-
-
    return dist
-
 
    """
    
@@ -430,16 +432,16 @@ def is_goal(state):
 
 
 
-limit = 220
+limit = 275
 initial_state = Crafting['Initial']
 
-fc, fl = search(graph, initial_state, is_goal, limit, heuristic)
+cost, steps = search(graph, initial_state, is_goal, limit, heuristic)
 
-print fc
-thing = 0
-for item in fl:
-   print "step ", thing, " with ", item
-   thing+=1
+count = 1
+for step in steps:
+   print "step ", count, ": ", step
+   count += 1
+print "cost: ", cost
 
 
 
